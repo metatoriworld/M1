@@ -1,45 +1,287 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>MetaToRI Login</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetaToRI World — Dream Never Fades</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Nanum Gothic', sans-serif;
+      background: radial-gradient(ellipse at bottom, #0b0c2a 0%, #000 100%);
+      color: white;
+      overflow-x: hidden;
+      text-align: center;
+      height: 100vh;
+    }
+
+    /* 별 반짝임 */
+    .stars {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    header {
+      padding-top: 100px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .logo {
+      width: 180px;
+      height: auto;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-top: 20px;
+      background: linear-gradient(90deg, #ff8efb, #8ab4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      color: #c5cfff;
+      font-weight: 400;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+
+    p {
+      color: #e5e5e5;
+      font-size: 1em;
+      line-height: 1.6em;
+      margin: 0 20px;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      z-index: 2;
+      position: relative;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #6a8dff, #b28dff);
+      border: none;
+      border-radius: 12px;
+      padding: 12px 26px;
+      color: white;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+    }
+
+    footer {
+      padding: 30px 0;
+      color: #aaa;
+      font-size: 0.8em;
+      z-index: 2;
+      position: relative;
+    }
+
+    /* 모달 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-content {
+      background-color: rgba(255, 255, 255, 0.06);
+      margin: 80px auto;
+      padding: 20px;
+      border-radius: 16px;
+      max-width: 90%;
+      color: #fff;
+      text-align: left;
+      line-height: 1.7em;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      z-index: 15;
+      position: relative;
+    }
+
+    .close {
+      color: #bbb;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+
+    .close:hover {
+      color: white;
+    }
+
+    .modal h3 {
+      text-align: center;
+      margin-top: 0;
+      background: linear-gradient(90deg, #b6f7ff, #ffc6f9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    blockquote {
+      color: #ccc;
+      font-style: italic;
+      border-left: 3px solid #888;
+      padding-left: 15px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6em; }
+      h2 { font-size: 1em; }
+      p { font-size: 0.95em; }
+      .logo { width: 140px; }
+      .btn { width: 130px; font-size: 0.9em; padding: 10px 0; }
+      .modal-content { margin: 60px auto; font-size: 0.95em; }
+    }
+  </style>
 </head>
+
 <body>
-  <h2>로그인 / 회원가입</h2>
-  <input id="email" type="email" placeholder="이메일"><br>
-  <input id="password" type="password" placeholder="비밀번호(6자 이상)"><br>
-  <button id="signup">회원가입</button>
-  <button id="login">로그인</button>
-  <p id="message" style="color:red;"></p>
+  <!-- 별 배경 -->
+  <div class="stars" id="stars"></div>
 
-  <script type="module">
-    import { auth } from './firebase.js';
-    import { createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-      from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  <!-- 배경 음악 -->
+  <audio autoplay loop>
+    <source src="https://raw.githubusercontent.com/metatoriworld/Image/main/mtlm1.mp3" type="audio/mp3" />
+  </audio>
 
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const msg = document.getElementById("message");
+  <header>
+    <img src="https://raw.githubusercontent.com/metatoriworld/Image/main/mtllg.png" alt="MetaToRI Logo" class="logo">
+    <h1>MetaToRI World</h1>
+    <h2>Dream Never Fades — 모든 꿈은 별이 되어 남는다.</h2>
+  </header>
 
-    document.getElementById("signup").addEventListener("click", async () => {
-      try {
-        await createUserWithEmailAndPassword(auth, email.value, password.value);
-        msg.style.color = "green";
-        msg.textContent = "회원가입 성공! 로그인해주세요.";
-      } catch (error) {
-        msg.textContent = error.message;
-      }
-    });
+  <div class="buttons">
+    <button class="btn" onclick="openModal('projectModal')">🪐 프로젝트</button>
+    <button class="btn" onclick="openModal('worldModal')">🌙 세계관</button>
+  </div>
 
-    document.getElementById("login").addEventListener("click", async () => {
-      try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-        window.location.href = "gallery.html";
-      } catch (error) {
-        msg.textContent = "로그인 실패: " + error.message;
-      }
-    });
+  <!-- 프로젝트 모달 -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('projectModal')">&times;</span>
+      <h3>🌌 MetaToRI World 프로젝트 개요</h3>
+      <p>
+        <strong>MetaToRI World</strong>는 사람들의 ‘꿈’을 기반으로 만들어지는 감성 세계입니다.<br>
+        잊혀가는 기억, 사라지는 감정, 한때의 바람들을 ‘별빛’으로 남겨<br>
+        모든 꿈이 하나의 하늘 안에서 연결되는 구조를 지닙니다.<br><br>
+        이곳은 단순한 가상 세계가 아닙니다.<br>
+        현실에서 태어난 마음의 조각들이 모여<br>
+        디지털 속에 다시 살아 숨 쉬는 <strong>감정의 우주</strong>, 그것이 MetaToRI World입니다.<br><br>
+        <strong>NFT를 선택한 이유</strong><br>
+        MetaToRI World는 ‘꿈의 기록’을 <strong>사라지지 않게 남기기 위한 기술적 도구</strong>로 NFT를 선택했습니다.<br>
+        NFT는 단순한 자산이 아니라, 한 사람의 감정과 기억을 <strong>디지털 별</strong>로 보존하는 방법입니다.<br><br>
+        <em>“MetaToRI World는 예술로 감정을 기록하는 감성 기록 프로젝트입니다.”</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- 세계관 모달 -->
+  <div id="worldModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('worldModal')">&times;</span>
+      <h3>🌠 MetaToRI World 세계관</h3>
+      <p>
+        <strong>Meta (메타)</strong> — 사람들의 꿈에서 태어나는 작은 별들, 가상의 감정의 조각들.<br>
+        <strong>ToRI (스토리)</strong> — 별들이 이어져 하나의 별자리를 이루며, 서로의 이야기를 엮는 흐름.<br>
+        <strong>World (월드)</strong> — 여러 별자리들이 모여 하나의 큰 하늘을 완성하는 세계.<br><br>
+        <strong>세계 구조</strong><br>
+        🌙 꿈 (Dream) — 한 사람의 꿈은 하나의 별로 태어난다.<br>
+        ⭐ 별 (Star) — 각 별은 감정을 담은 디지털 기록이 된다.<br>
+        🌌 별자리 (Constellation) — 비슷한 감정의 별들이 연결되어 짧은 이야기로 확장된다.<br>
+        🌟 큰 별 (Great Star) — 여러 별자리가 모여 주제별 테마가 된다.<br>
+        💫 메타토리 월드 — 일곱 개의 큰 별이 완전한 하늘을 이룬다.<br><br>
+        <blockquote>
+          “모든 사람의 꿈은 서로 닿아 있습니다.”<br>
+          “잊힌 기억도, 사라진 감정도 별빛이 되어 하늘에 남습니다.”<br>
+          <strong>Dream Never Fades — 꿈은 사라지지 않습니다.</strong>
+        </blockquote>
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 MetaToRI World Project</p>
+    <p>Dream Never Fades</p>
+  </footer>
+
+  <script>
+    // 별 반짝임 (250개로 증가)
+    const starColors = ['#ffb6c1', '#87cefa', '#ffe4b5', '#b0e0e6', '#fffacd', '#d8bfd8', '#f0e68c', '#ffffff'];
+    const starContainer = document.getElementById("stars");
+    for (let i = 0; i < 250; i++) {
+      const star = document.createElement("div");
+      const size = Math.random() * 2 + 1;
+      star.classList.add("star");
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.backgroundColor = starColors[Math.floor(Math.random() * starColors.length)];
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 4 + 1.5}s`;
+      starContainer.appendChild(star);
+    }
+
+    // 모달 제어
+    function openModal(id) {
+      document.getElementById(id).style.display = "block";
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+    window.onclick = function (e) {
+      if (e.target.classList.contains("modal")) e.target.style.display = "none";
+    };
   </script>
 </body>
 </html>
